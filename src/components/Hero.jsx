@@ -79,7 +79,18 @@ export default function Hero() {
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-6xl mx-auto px-5 sm:px-8 md:px-12 pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-18 lg:pb-20">
-        <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10">
+        <div className="flex flex-col lg:flex-row items-center justify-between gap-6 lg:gap-10">
+
+          {/* ── MOBILE 3D widget — shown above text on mobile only ── */}
+          <motion.div
+            className="flex lg:hidden w-full items-center justify-center order-first overflow-hidden"
+            style={{ height: 220 }}
+            initial={{ opacity:0, y:-20, scale:0.88 }}
+            animate={{ opacity:1, y:0, scale:1 }}
+            transition={{ duration:1.0, delay:0.4, ease:[0.22,1,0.36,1] }}
+          >
+            <C3Hero3D mobileCompact />
+          </motion.div>
 
           {/* ── LEFT: text — full width + centered on mobile, left-aligned on desktop ── */}
           <div className="flex-1 min-w-0 w-full max-w-2xl lg:max-w-none text-center lg:text-left mx-auto lg:mx-0">
