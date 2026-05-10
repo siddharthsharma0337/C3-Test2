@@ -78,13 +78,13 @@ export default function Hero() {
       />
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-6xl mx-auto px-5 sm:px-8 md:px-12 pt-28 pb-20">
+      <div className="relative z-10 w-full max-w-6xl mx-auto px-5 sm:px-8 md:px-12 pt-20 sm:pt-24 lg:pt-28 pb-16 sm:pb-18 lg:pb-20">
         <div className="flex flex-col lg:flex-row items-center justify-between gap-8 lg:gap-10">
 
           {/* ── LEFT: text — full width + centered on mobile, left-aligned on desktop ── */}
           <div className="flex-1 min-w-0 w-full max-w-2xl lg:max-w-none text-center lg:text-left mx-auto lg:mx-0">
             {/* Headline — always white because hero is always dark */}
-            <div className="overflow-hidden mb-1">
+            <div className="overflow-hidden mb-0.5">
               <h1
                 data-testid="hero-headline-top"
                 className="font-display font-semibold whitespace-nowrap"
@@ -109,7 +109,7 @@ export default function Hero() {
                 ))}
               </h1>
             </div>
-            <div className="overflow-hidden mb-7">
+            <div className="overflow-hidden mb-5 sm:mb-7">
               <h1
                 data-testid="hero-headline-bottom"
                 className="font-display font-semibold text-gradient-mint whitespace-nowrap"
@@ -137,7 +137,7 @@ export default function Hero() {
             {/* Terminal */}
             <motion.div
               data-testid="hero-terminal"
-              className="mb-7 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border"
+              className="mb-5 sm:mb-7 inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border"
               style={{ background: 'rgba(255,255,255,0.05)', borderColor: 'rgba(255,255,255,0.10)' }}
               initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
               transition={{ duration:0.6, delay:1.4 }}
@@ -151,7 +151,7 @@ export default function Hero() {
 
             {/* Subline */}
             <motion.p
-              className="font-grotesk text-base md:text-lg mb-8 body-text-width"
+              className="font-grotesk text-base md:text-lg mb-6 sm:mb-8 body-text-width"
               style={{ color: 'rgba(255,255,255,0.62)' }}
               initial={{ opacity:0, y:20 }} animate={{ opacity:1, y:0 }}
               transition={{ duration:0.6, delay:1.5 }}

@@ -42,31 +42,73 @@ const PANELS = [
 
 export default function C3Hero3D() {
   const sceneRef = useRef(null);
-  const rafRef   = useRef(null);
+  const rafRef = useRef(null);
   const mouseRef = useRef({ x: 0, y: 0 });
-  const curRef   = useRef({ x: 0, y: 0 });
+  const curRef = useRef({ x: 0, y: 0 });
+  const boundsRef = useRef(null);
 
-  /* ── mouse parallax ── */
   useEffect(() => {
+    /* ── use the scene's own bounding box so even small
+       movements within the element register fully ── */
+    const updateBounds = () => {
+      if (sceneRef.current) {
+        boundsRef.current = sceneRef.current
+          .closest('.c3-3d-wrap')
+          ?.getBoundingClientRect() ?? null;
+      }
+    };
+    updateBounds();
+    window.addEventListener('resize', updateBounds);
+
     const onMove = (e) => {
-      const { innerWidth: w, innerHeight: h } = window;
-      mouseRef.current = {
-        x: (e.clientX / w - 0.5) * 2,   // -1 → 1
-        y: (e.clientY / h - 0.5) * 2,
-      };
+      const b = boundsRef.current;
+      if (b) {
+        /* map mouse relative to the component's own rect — 
+           tiny movements inside the element become full -1→1 range */
+        const cx = b.left + b.width / 2;
+        const cy = b.top + b.height / 2;
+        /* use half-width as the normalisation radius so moving
+           from center to edge = full ±1 */
+        const rx = Math.max(b.width, 320) / 2;
+        const ry = Math.max(b.height, 320) / 2;
+        mouseRef.current = {
+          x: Math.max(-1, Math.min(1, (e.clientX - cx) / rx)),
+          y: Math.max(-1, Math.min(1, (e.clientY - cy) / ry)),
+        };
+      } else {
+        /* fallback: full-window normalisation */
+        mouseRef.current = {
+          x: (e.clientX / window.innerWidth - 0.5) * 2,
+          y: (e.clientY / window.innerHeight - 0.5) * 2,
+        };
+      }
     };
     window.addEventListener('mousemove', onMove);
 
     const tick = () => {
-      const ease = 0.06;
+      /* 
+        Ease bumped from 0.06 → 0.10: snappier tracking.
+        Still smooth but reacts noticeably to small movements.
+      */
+      const ease = 0.10;
       curRef.current.x += (mouseRef.current.x - curRef.current.x) * ease;
       curRef.current.y += (mouseRef.current.y - curRef.current.y) * ease;
 
       if (sceneRef.current) {
-        const rx = -curRef.current.y * 12;   // tilt up/down
-        const ry =  curRef.current.x * 16;   // tilt left/right
+        /*
+          Rotation angles bumped significantly:
+            X (tilt up/down):  12 → 22 deg
+            Y (tilt left/right): 16 → 28 deg
+          This makes every small mouse shift clearly visible.
+        */
+        const rx = -curRef.current.y * 22;
+        const ry = curRef.current.x * 28;
+
+        /* Extra: slight Z-roll for depth feel on diagonal movement */
+        const rz = curRef.current.x * curRef.current.y * 4;
+
         sceneRef.current.style.transform =
-          `rotateX(${rx}deg) rotateY(${ry}deg)`;
+          `rotateX(${rx}deg) rotateY(${ry}deg) rotateZ(${rz}deg)`;
       }
       rafRef.current = requestAnimationFrame(tick);
     };
@@ -74,16 +116,47 @@ export default function C3Hero3D() {
 
     return () => {
       window.removeEventListener('mousemove', onMove);
+      window.removeEventListener('resize', updateBounds);
       cancelAnimationFrame(rafRef.current);
+    };
+  }, []);
+
+  /* ── idle sway when mouse hasn't moved ── */
+  useEffect(() => {
+    let idleRaf;
+    let idleT = 0;
+    let lastMove = Date.now();
+
+    const onMove = () => { lastMove = Date.now(); };
+    window.addEventListener('mousemove', onMove);
+
+    const idleTick = () => {
+      const idle = Date.now() - lastMove > 2000; // 2s without movement
+      if (idle && sceneRef.current) {
+        idleT += 0.008;
+        const swayX = Math.sin(idleT * 0.9) * 0.3;
+        const swayY = Math.cos(idleT * 0.7) * 0.2;
+        /* blend idle sway INTO the current lerped position */
+        mouseRef.current = {
+          x: swayX,
+          y: swayY,
+        };
+      }
+      idleRaf = requestAnimationFrame(idleTick);
+    };
+    idleRaf = requestAnimationFrame(idleTick);
+
+    return () => {
+      window.removeEventListener('mousemove', onMove);
+      cancelAnimationFrame(idleRaf);
     };
   }, []);
 
   return (
     <>
       <style>{`
-        /* ── scene wrapper ── */
         .c3-3d-wrap {
-          perspective: 900px;
+          perspective: 700px;
           perspective-origin: 50% 42%;
           display: flex;
           align-items: center;
@@ -93,17 +166,15 @@ export default function C3Hero3D() {
           min-height: 420px;
         }
 
-        /* ── rotating scene root ── */
         .c3-scene {
           position: relative;
           width: 260px;
           height: 260px;
           transform-style: preserve-3d;
-          transition: transform 0.05s linear; /* overridden by rAF */
+          /* NO css transition here — rAF drives it directly for instant response */
           will-change: transform;
         }
 
-        /* ── centre cube / card ── */
         .c3-core {
           position: absolute;
           inset: 0;
@@ -123,7 +194,6 @@ export default function C3Hero3D() {
           animation: c3-float 4s ease-in-out infinite;
         }
 
-        /* ── the C³ text mark ── */
         .c3-mark {
           font-family: 'Clash Display', sans-serif;
           font-size: 6.5rem;
@@ -145,14 +215,12 @@ export default function C3Hero3D() {
           filter: drop-shadow(0 0 12px rgba(56,191,255,0.8));
         }
 
-        /* ── green triangle base ── */
         .c3-triangle {
           position: absolute;
           bottom: -22%;
           left: 50%;
           transform: translateX(-50%) translateZ(-10px) rotateX(10deg);
-          width: 0;
-          height: 0;
+          width: 0; height: 0;
           border-left:  100px solid transparent;
           border-right: 100px solid transparent;
           border-top:   70px solid rgba(74,240,160,0.18);
@@ -160,17 +228,14 @@ export default function C3Hero3D() {
         }
         .c3-triangle-glow {
           position: absolute;
-          bottom: -28%;
-          left: 50%;
+          bottom: -28%; left: 50%;
           transform: translateX(-50%) translateZ(-30px);
-          width: 260px;
-          height: 80px;
+          width: 260px; height: 80px;
           background: radial-gradient(ellipse at 50% 0%, rgba(74,240,160,0.35) 0%, transparent 70%);
           filter: blur(12px);
           pointer-events: none;
         }
 
-        /* ── floating code panels ── */
         .c3-panel {
           position: absolute;
           width: 140px;
@@ -183,10 +248,10 @@ export default function C3Hero3D() {
           animation: c3-float 4s ease-in-out infinite;
           pointer-events: none;
         }
-        .c3-panel:nth-child(2) { animation-delay: -0.8s; animation-duration: 4.4s; }
-        .c3-panel:nth-child(3) { animation-delay: -1.6s; animation-duration: 3.8s; }
-        .c3-panel:nth-child(4) { animation-delay: -2.4s; animation-duration: 4.6s; }
-        .c3-panel:nth-child(5) { animation-delay: -3.2s; animation-duration: 4.2s; }
+        .c3-panel:nth-child(2) { animation-delay: -0.8s;  animation-duration: 4.4s; }
+        .c3-panel:nth-child(3) { animation-delay: -1.6s;  animation-duration: 3.8s; }
+        .c3-panel:nth-child(4) { animation-delay: -2.4s;  animation-duration: 4.6s; }
+        .c3-panel:nth-child(5) { animation-delay: -3.2s;  animation-duration: 4.2s; }
 
         .c3-panel-dot {
           width: 7px; height: 7px;
@@ -194,7 +259,6 @@ export default function C3Hero3D() {
           display: inline-block;
           margin-bottom: 8px;
         }
-
         .c3-panel-line {
           font-family: 'JetBrains Mono', monospace;
           font-size: 9px;
@@ -205,7 +269,6 @@ export default function C3Hero3D() {
         }
         .c3-panel-line.accent { font-weight: 500; }
 
-        /* ── orbit ring ── */
         .c3-ring {
           position: absolute;
           inset: -40px;
@@ -245,11 +308,9 @@ export default function C3Hero3D() {
           transform: translateX(-50%);
         }
 
-        /* ── corner icon ── */
         .c3-corner-tag {
           position: absolute;
-          bottom: -52px;
-          left: 50%;
+          bottom: -52px; left: 50%;
           transform: translateX(-50%) translateZ(10px);
           background: rgba(14,22,32,0.9);
           border: 1px solid rgba(74,240,160,0.2);
@@ -264,58 +325,52 @@ export default function C3Hero3D() {
           pointer-events: none;
         }
 
-        /* ── keyframes ── */
         @keyframes c3-float {
-          0%, 100% { transform-origin: center; margin-top: 0px; }
+          0%, 100% { margin-top: 0px; }
           50%       { margin-top: -14px; }
         }
         @keyframes c3-spin {
           from { transform: rotateX(75deg) translateZ(-20px) rotateZ(0deg); }
           to   { transform: rotateX(75deg) translateZ(-20px) rotateZ(360deg); }
         }
-        @keyframes c3-pulse-glow {
-          0%,100% { opacity: 0.6; }
-          50%     { opacity: 1; }
-        }
 
-        /* ── responsive ── */
         @media (max-width: 640px) {
           .c3-scene { width: 180px; height: 180px; }
           .c3-mark  { font-size: 4.5rem; }
           .c3-mark sup { font-size: 2rem; }
-          .c3-panel { display: none; }
-          .c3-ring, .c3-ring-2 { display: none; }
-          .c3-triangle { display: none; }
+          .c3-panel, .c3-ring, .c3-ring-2, .c3-triangle { display: none; }
         }
       `}</style>
 
       <div className="c3-3d-wrap">
         <div className="c3-scene" ref={sceneRef}>
 
-          {/* orbit rings */}
           <div className="c3-ring" />
           <div className="c3-ring-2" />
 
-          {/* floating panels */}
           {PANELS.map((p) => (
             <div key={p.id} className="c3-panel" style={p.style}>
               <div>
-                <span className="c3-panel-dot" style={{ background: p.accent, boxShadow: `0 0 6px ${p.accent}` }} />
+                <span
+                  className="c3-panel-dot"
+                  style={{ background: p.accent, boxShadow: `0 0 6px ${p.accent}` }}
+                />
               </div>
               {p.lines.map((line, i) => (
-                <div key={i} className={`c3-panel-line${i === 0 ? ' accent' : ''}`}
-                  style={i === 0 ? { color: p.accent } : {}}>
+                <div
+                  key={i}
+                  className={`c3-panel-line${i === 0 ? ' accent' : ''}`}
+                  style={i === 0 ? { color: p.accent } : {}}
+                >
                   {line || '\u00A0'}
                 </div>
               ))}
             </div>
           ))}
 
-          {/* triangle base + glow */}
           <div className="c3-triangle" />
           <div className="c3-triangle-glow" />
 
-          {/* centre card */}
           <div className="c3-core">
             <div className="c3-mark">
               <span className="c">C</span>
@@ -323,7 +378,6 @@ export default function C3Hero3D() {
             </div>
           </div>
 
-          {/* bottom label */}
           <div className="c3-corner-tag">Coding Centralized</div>
 
         </div>

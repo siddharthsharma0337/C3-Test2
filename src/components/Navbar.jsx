@@ -183,14 +183,19 @@ export default function Navbar() {
           padding:        scrolled ? '8px 18px'  : '0',
           background:     scrolled
             ? isDark
-              ? 'rgba(8,11,16,0.82)'
-              : 'rgba(248,250,249,0.88)'
+              ? 'rgba(8,11,16,0.88)'
+              : 'rgba(255,255,255,0.95)'
             : 'transparent',
           backdropFilter:       scrolled ? 'blur(24px) saturate(160%)' : 'none',
           WebkitBackdropFilter: scrolled ? 'blur(24px) saturate(160%)' : 'none',
-          border:       scrolled ? '1px solid var(--c-border)' : '1px solid transparent',
-          borderBottom: scrolled ? undefined : '1px solid var(--c-border)',
-          boxShadow:    scrolled ? '0 8px 40px rgba(0,0,0,0.2)' : 'none',
+          border:       scrolled
+            ? isDark ? '1px solid rgba(255,255,255,0.10)' : '1px solid rgba(0,0,0,0.12)'
+            : '1px solid transparent',
+          borderBottom: scrolled ? undefined
+            : isDark ? '1px solid rgba(255,255,255,0.06)' : '1px solid rgba(0,0,0,0.08)',
+          boxShadow:    scrolled
+            ? isDark ? '0 8px 40px rgba(0,0,0,0.35)' : '0 4px 24px rgba(0,0,0,0.12), 0 1px 4px rgba(0,0,0,0.08)'
+            : 'none',
           transition: [
             'top 0.55s cubic-bezier(0.22,1,0.36,1)',
             'width 0.55s cubic-bezier(0.22,1,0.36,1)',
@@ -227,7 +232,7 @@ export default function Navbar() {
               <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:'1.35rem', fontWeight:700, color:'var(--c-mint)', lineHeight:1 }}>C</span>
               <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:'0.55rem', fontWeight:700, color:'var(--c-electric)', lineHeight:1, position:'relative', top:'-6px', marginLeft:'1px' }}>³</span>
             </span>
-            <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:'1.15rem', fontWeight:600, color:'var(--c-fg)', marginLeft:'5px', lineHeight:1 }}>Club</span>
+            <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:'1.15rem', fontWeight:700, color: scrolled ? (isDark ? '#f0f4f8' : '#0d1117') : '#f0f4f8', marginLeft:'5px', lineHeight:1 }}>Club</span>
           </a>
 
 
@@ -337,7 +342,7 @@ export default function Navbar() {
                 >
                   <span style={{ fontFamily: "'Clash Display',sans-serif", fontSize: '1.15rem', fontWeight: 700, color: 'var(--c-mint)' }}>C</span>
                   <sup style={{ fontFamily: "'Clash Display',sans-serif", fontSize: '0.6rem', fontWeight: 700, color: 'var(--c-electric)', verticalAlign: 'super' }}>³</sup>
-                  <span style={{ fontFamily: "'Clash Display',sans-serif", fontSize: '1rem', fontWeight: 600, color: 'var(--c-fg)', marginLeft: '4px' }}>Club</span>
+                  <span style={{ fontFamily: "'Clash Display',sans-serif", fontSize: '1rem', fontWeight: 700, color: isDark ? '#f0f4f8' : '#0d1117', marginLeft: '4px' }}>Club</span>
                 </a>
 
                 {/* Close — X icon */}

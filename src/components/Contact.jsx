@@ -79,72 +79,10 @@ export default function Contact({ sectionClass = '' }) {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
+        <div className="flex flex-col lg:grid lg:grid-cols-2 gap-6 md:gap-8">
 
-          {/* ── Social cards ── */}
-          <div className="flex flex-col gap-3">
-            {SOCIALS.map((s, i) => {
-              const Icon = s.icon;
-              return (
-                <motion.a
-                  key={s.id}
-                  {...fadeUp(i * 0.1)}
-                  data-testid={`social-${s.id}`}
-                  href={s.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="group rounded-2xl border-soft"
-                  style={{
-                    background: 'var(--c-surface)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 14,
-                    padding: '14px 16px',
-                    textDecoration: 'none',
-                    transition: 'transform 0.2s, box-shadow 0.2s',
-                    overflow: 'hidden',          /* stop any child overflow */
-                  }}
-                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.02)'; }}
-                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
-                >
-                  {/* Icon badge */}
-                  <div
-                    className={`${s.gradient} rounded-xl flex items-center justify-center`}
-                    style={{ width:44, height:44, flexShrink:0 }}
-                  >
-                    <Icon size={19} color="white" />
-                  </div>
-
-                  {/* Text — min-w-0 + overflow-hidden prevent blowout */}
-                  <div style={{ flex:1, minWidth:0, overflow:'hidden' }}>
-                    <p className="font-display font-semibold text-sm" style={{ color:'var(--c-fg)' }}>
-                      {s.name}
-                    </p>
-                    <p className="font-mono text-[11px] mt-0.5" style={{ color:'var(--c-mint)' }}>
-                      {s.handle}
-                    </p>
-                    {/* desc — wrap instead of truncate */}
-                    <p
-                      className="font-grotesk text-xs mt-0.5 leading-snug"
-                      style={{ color:'var(--c-fg-mute)', whiteSpace:'normal', wordBreak:'break-word' }}
-                    >
-                      {s.desc}
-                    </p>
-                  </div>
-
-                  {/* Arrow */}
-                  <ArrowUpRight
-                    size={16}
-                    style={{ color:'var(--c-fg-mute)', flexShrink:0, transition:'transform 0.2s' }}
-                    className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
-                  />
-                </motion.a>
-              );
-            })}
-          </div>
-
-          {/* ── Countdown card ── */}
-          <motion.div {...fadeUp(0.15)}>
+          {/* ── COUNTDOWN — first on mobile, right column on desktop ── */}
+          <motion.div {...fadeUp(0.15)} className="lg:order-2">
             <div
               data-testid="countdown-card"
               className="rounded-2xl border-soft flex flex-col items-center justify-center text-center relative overflow-hidden"
@@ -166,7 +104,7 @@ export default function Contact({ sectionClass = '' }) {
               </p>
               <div style={{ width:40, height:1, background:'var(--c-border)', margin:'10px 0 20px' }} />
 
-              {/* Counter row — gap scales with viewport */}
+              {/* Counter row */}
               <div style={{ display:'flex', alignItems:'flex-start', gap:'clamp(4px, 2vw, 10px)', marginBottom:24 }}>
                 <CounterBox value={t.d} label="Days"  testId="countdown-days"    />
                 <span className="font-display font-bold" style={{ color:'var(--c-fg-mute)', paddingTop:10, fontSize:'1.1rem' }}>:</span>
@@ -198,6 +136,102 @@ export default function Contact({ sectionClass = '' }) {
               </a>
             </div>
           </motion.div>
+
+          {/* ── SOCIALS ── */}
+          <div className="lg:order-1">
+            {/* Desktop: full social cards */}
+            <div className="hidden lg:flex flex-col gap-3">
+              {SOCIALS.map((s, i) => {
+                const Icon = s.icon;
+                return (
+                  <motion.a
+                    key={s.id}
+                    {...fadeUp(i * 0.1)}
+                    data-testid={`social-${s.id}`}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group rounded-2xl border-soft"
+                    style={{
+                      background: 'var(--c-surface)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: 14,
+                      padding: '14px 16px',
+                      textDecoration: 'none',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
+                      overflow: 'hidden',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.02)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                  >
+                    <div
+                      className={`${s.gradient} rounded-xl flex items-center justify-center`}
+                      style={{ width:44, height:44, flexShrink:0 }}
+                    >
+                      <Icon size={19} color="white" />
+                    </div>
+                    <div style={{ flex:1, minWidth:0, overflow:'hidden' }}>
+                      <p className="font-display font-semibold text-sm" style={{ color:'var(--c-fg)' }}>
+                        {s.name}
+                      </p>
+                      <p className="font-mono text-[11px] mt-0.5" style={{ color:'var(--c-mint)' }}>
+                        {s.handle}
+                      </p>
+                      <p
+                        className="font-grotesk text-xs mt-0.5 leading-snug"
+                        style={{ color:'var(--c-fg-mute)', whiteSpace:'normal', wordBreak:'break-word' }}
+                      >
+                        {s.desc}
+                      </p>
+                    </div>
+                    <ArrowUpRight
+                      size={16}
+                      style={{ color:'var(--c-fg-mute)', flexShrink:0, transition:'transform 0.2s' }}
+                      className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                    />
+                  </motion.a>
+                );
+              })}
+            </div>
+
+            {/* Mobile: icon-only chips in a single equal row */}
+            <div className="flex lg:hidden items-stretch gap-3">
+              {SOCIALS.map((s, i) => {
+                const Icon = s.icon;
+                return (
+                  <motion.a
+                    key={s.id}
+                    data-testid={`social-${s.id}`}
+                    href={s.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    initial={{ opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.1 + i * 0.08, duration: 0.38, ease: [0.22,1,0.36,1] }}
+                    className="flex-1 flex flex-col items-center justify-center gap-2 py-4 rounded-2xl border-soft"
+                    style={{
+                      background: 'var(--c-surface)',
+                      textDecoration: 'none',
+                      transition: 'transform 0.18s',
+                    }}
+                    onTouchStart={e => { e.currentTarget.style.transform = 'scale(0.96)'; }}
+                    onTouchEnd={e => { e.currentTarget.style.transform = 'scale(1)'; }}
+                  >
+                    <div
+                      className={`${s.gradient} rounded-xl flex items-center justify-center`}
+                      style={{ width:46, height:46, flexShrink:0, boxShadow:'0 4px 14px rgba(0,0,0,0.25)' }}
+                    >
+                      <Icon size={20} color="white" />
+                    </div>
+                    <span className="font-grotesk text-[11px] font-semibold" style={{ color:'var(--c-fg-soft)' }}>
+                      {s.name}
+                    </span>
+                  </motion.a>
+                );
+              })}
+            </div>
+          </div>
 
         </div>
       </div>
