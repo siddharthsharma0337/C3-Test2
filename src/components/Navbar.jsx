@@ -53,9 +53,16 @@ export default function Navbar() {
 
   const handleAnchor = (e, href) => {
     e.preventDefault();
+    const wasOpen = mobileOpen;
     setMobileOpen(false);
-    const el = document.querySelector(href);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // Wait for drawer close animation before scrolling
+    setTimeout(() => {
+      const el = document.querySelector(href);
+      if (!el) return;
+      const navOffset = 88; // sticky navbar height
+      const top = el.getBoundingClientRect().top + window.scrollY - navOffset;
+      window.scrollTo({ top, behavior: 'smooth' });
+    }, wasOpen ? 320 : 0);
   };
 
   const isDark = theme === 'dark';
@@ -213,12 +220,16 @@ export default function Navbar() {
             data-testid="nav-logo"
             href="#"
             onClick={(e) => { e.preventDefault(); window.scrollTo({ top:0, behavior:'smooth' }); }}
-            style={{ display:'flex', alignItems:'baseline', gap:'1px', textDecoration:'none', flexShrink:0, userSelect:'none' }}
+            style={{ display:'flex', alignItems:'center', gap:0, textDecoration:'none', flexShrink:0, userSelect:'none', lineHeight:1 }}
           >
-            <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:'1.4rem', fontWeight:700, color:'var(--c-mint)', lineHeight:1 }}>C</span>
-            <sup  style={{ fontFamily:"'Clash Display',sans-serif", fontSize:'0.7rem', fontWeight:700, color:'var(--c-electric)', lineHeight:1, verticalAlign:'super' }}>³</sup>
-            <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:'1.2rem', fontWeight:600, color:'var(--c-fg)', marginLeft:'5px', lineHeight:1 }}>Club</span>
+            {/* C³ as a single unit — relative container so ³ can be positioned */}
+            <span style={{ position:'relative', display:'inline-flex', alignItems:'center' }}>
+              <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:'1.35rem', fontWeight:700, color:'var(--c-mint)', lineHeight:1 }}>C</span>
+              <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:'0.55rem', fontWeight:700, color:'var(--c-electric)', lineHeight:1, position:'relative', top:'-6px', marginLeft:'1px' }}>³</span>
+            </span>
+            <span style={{ fontFamily:"'Clash Display',sans-serif", fontSize:'1.15rem', fontWeight:600, color:'var(--c-fg)', marginLeft:'5px', lineHeight:1 }}>Club</span>
           </a>
+
 
           {/* ── DESKTOP LINKS ── */}
           <nav className="c3-desktop-nav" style={{ alignItems:'center', gap:'26px', flex:1, justifyContent:'center' }}>

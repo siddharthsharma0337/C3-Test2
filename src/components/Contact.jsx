@@ -30,13 +30,16 @@ function CounterBox({ value, label, testId }) {
   return (
     <div
       data-testid={testId}
-      className="flex flex-col items-center p-3 sm:p-4 rounded-xl border-soft"
-      style={{ background:'var(--c-surface-2)', minWidth:60 }}
+      className="flex flex-col items-center rounded-xl border-soft"
+      style={{ background:'var(--c-surface-2)', padding:'10px 12px', minWidth:52 }}
     >
-      <span className="font-display font-bold text-2xl sm:text-3xl leading-none" style={{ color:'var(--c-mint)' }}>
+      <span
+        className="font-display font-bold leading-none"
+        style={{ color:'var(--c-mint)', fontSize:'clamp(1.25rem, 5vw, 1.75rem)' }}
+      >
         {String(value).padStart(2,'0')}
       </span>
-      <span className="font-mono text-[9px] tracking-[0.2em] uppercase mt-1.5" style={{ color:'var(--c-fg-mute)' }}>
+      <span className="font-mono tracking-widest uppercase mt-1" style={{ color:'var(--c-fg-mute)', fontSize:'8px' }}>
         {label}
       </span>
     </div>
@@ -44,9 +47,9 @@ function CounterBox({ value, label, testId }) {
 }
 
 const SOCIALS = [
-  { id:'instagram', name:'Instagram', handle:'@c3.club',       desc:'Behind the scenes, project drops, and announcements.', icon:InstagramIcon, gradient:'grad-instagram', href:'#' },
-  { id:'whatsapp',  name:'WhatsApp',  handle:'Community Group', desc:'Join the official WhatsApp community for updates.',     icon:MessageCircle,  gradient:'grad-whatsapp',  href:'#' },
-  { id:'linkedin',  name:'LinkedIn',  handle:'C³ Club',         desc:'Professional updates, event recaps, and alumni network.',icon:LinkedinIcon, gradient:'grad-linkedin',  href:'#' },
+  { id:'instagram', name:'Instagram', handle:'@c3.club',        desc:'Behind the scenes & announcements.',         icon:InstagramIcon, gradient:'grad-instagram', href:'#' },
+  { id:'whatsapp',  name:'WhatsApp',  handle:'Community Group', desc:'Join the official community for updates.',   icon:MessageCircle, gradient:'grad-whatsapp',  href:'#' },
+  { id:'linkedin',  name:'LinkedIn',  handle:'C³ Club',          desc:'Events, recaps, and alumni network.',        icon:LinkedinIcon,  gradient:'grad-linkedin',  href:'#' },
 ];
 
 const fadeUp = (delay=0) => ({
@@ -71,14 +74,15 @@ export default function Contact({ sectionClass = '' }) {
           <h2 className="section-heading mb-4">
             Find us. <span className="text-gradient-mint">There.</span>
           </h2>
-          <p className="font-grotesk text-base md:text-lg body-text-width mb-12" style={{ color:'var(--c-fg-soft)' }}>
+          <p className="font-grotesk text-base md:text-lg body-text-width mb-10" style={{ color:'var(--c-fg-soft)' }}>
             Follow along and be the first to know when applications open.
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
-          {/* Social cards */}
-          <div className="flex flex-col gap-4">
+        <div className="grid lg:grid-cols-2 gap-6 md:gap-8">
+
+          {/* ── Social cards ── */}
+          <div className="flex flex-col gap-3">
             {SOCIALS.map((s, i) => {
               const Icon = s.icon;
               return (
@@ -89,63 +93,112 @@ export default function Contact({ sectionClass = '' }) {
                   href={s.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-4 sm:gap-5 p-4 sm:p-5 rounded-2xl border-soft transition-all hover:scale-[1.02] group"
-                  style={{ background:'var(--c-surface)' }}
+                  className="group rounded-2xl border-soft"
+                  style={{
+                    background: 'var(--c-surface)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 14,
+                    padding: '14px 16px',
+                    textDecoration: 'none',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    overflow: 'hidden',          /* stop any child overflow */
+                  }}
+                  onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.02)'; }}
+                  onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
                 >
-                  <div className={`${s.gradient} w-11 h-11 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center shrink-0`}>
-                    <Icon size={20} color="white" />
+                  {/* Icon badge */}
+                  <div
+                    className={`${s.gradient} rounded-xl flex items-center justify-center`}
+                    style={{ width:44, height:44, flexShrink:0 }}
+                  >
+                    <Icon size={19} color="white" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-display font-semibold text-base" style={{ color:'var(--c-fg)' }}>{s.name}</p>
-                    <p className="font-mono text-xs mt-0.5" style={{ color:'var(--c-mint)' }}>{s.handle}</p>
-                    <p className="font-grotesk text-sm mt-1 truncate" style={{ color:'var(--c-fg-mute)' }}>{s.desc}</p>
+
+                  {/* Text — min-w-0 + overflow-hidden prevent blowout */}
+                  <div style={{ flex:1, minWidth:0, overflow:'hidden' }}>
+                    <p className="font-display font-semibold text-sm" style={{ color:'var(--c-fg)' }}>
+                      {s.name}
+                    </p>
+                    <p className="font-mono text-[11px] mt-0.5" style={{ color:'var(--c-mint)' }}>
+                      {s.handle}
+                    </p>
+                    {/* desc — wrap instead of truncate */}
+                    <p
+                      className="font-grotesk text-xs mt-0.5 leading-snug"
+                      style={{ color:'var(--c-fg-mute)', whiteSpace:'normal', wordBreak:'break-word' }}
+                    >
+                      {s.desc}
+                    </p>
                   </div>
+
+                  {/* Arrow */}
                   <ArrowUpRight
-                    size={18}
-                    className="shrink-0 transition-transform group-hover:translate-x-1 group-hover:-translate-y-1"
-                    style={{ color:'var(--c-fg-mute)' }}
+                    size={16}
+                    style={{ color:'var(--c-fg-mute)', flexShrink:0, transition:'transform 0.2s' }}
+                    className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
                   />
                 </motion.a>
               );
             })}
           </div>
 
-          {/* Countdown */}
+          {/* ── Countdown card ── */}
           <motion.div {...fadeUp(0.15)}>
             <div
               data-testid="countdown-card"
-              className="rounded-2xl border-soft p-6 sm:p-8 flex flex-col items-center justify-center text-center h-full relative overflow-hidden"
-              style={{ background:'var(--c-surface)' }}
+              className="rounded-2xl border-soft flex flex-col items-center justify-center text-center relative overflow-hidden"
+              style={{ background:'var(--c-surface)', padding:'28px 20px' }}
             >
+              {/* Ambient glow */}
               <div
-                className="absolute top-0 left-1/2 -translate-x-1/2 w-64 h-64 rounded-full pointer-events-none"
-                style={{ background:'radial-gradient(circle, rgba(74,240,160,0.10) 0%, transparent 70%)', filter:'blur(30px)' }}
+                style={{
+                  position:'absolute', top:0, left:'50%', transform:'translateX(-50%)',
+                  width:240, height:240, borderRadius:'50%', pointerEvents:'none',
+                  background:'radial-gradient(circle, rgba(74,240,160,0.10) 0%, transparent 70%)',
+                  filter:'blur(28px)',
+                }}
               />
-              <span className="eyebrow mb-1" style={{ justifyContent:'center' }}>Until Inauguration</span>
-              <p className="font-display font-semibold text-xl mb-2" style={{ color:'var(--c-fg)' }}>15 May 2026</p>
-              <div className="w-12 h-px mb-6 mt-2" style={{ background:'var(--c-border)' }} />
 
-              <div className="flex items-start gap-2 sm:gap-3 mb-8">
-                <CounterBox value={t.d} label="Days"    testId="countdown-days"    />
-                <div className="font-display font-bold text-xl pt-3" style={{ color:'var(--c-fg-mute)' }}>:</div>
-                <CounterBox value={t.h} label="Hours"   testId="countdown-hours"   />
-                <div className="font-display font-bold text-xl pt-3" style={{ color:'var(--c-fg-mute)' }}>:</div>
-                <CounterBox value={t.m} label="Mins"    testId="countdown-minutes" />
-                <div className="font-display font-bold text-xl pt-3" style={{ color:'var(--c-fg-mute)' }}>:</div>
-                <CounterBox value={t.s} label="Secs"    testId="countdown-seconds" />
+              <span className="eyebrow mb-1" style={{ justifyContent:'center' }}>Until Inauguration</span>
+              <p className="font-display font-semibold text-lg mb-1" style={{ color:'var(--c-fg)' }}>
+                15 May 2026
+              </p>
+              <div style={{ width:40, height:1, background:'var(--c-border)', margin:'10px 0 20px' }} />
+
+              {/* Counter row — gap scales with viewport */}
+              <div style={{ display:'flex', alignItems:'flex-start', gap:'clamp(4px, 2vw, 10px)', marginBottom:24 }}>
+                <CounterBox value={t.d} label="Days"  testId="countdown-days"    />
+                <span className="font-display font-bold" style={{ color:'var(--c-fg-mute)', paddingTop:10, fontSize:'1.1rem' }}>:</span>
+                <CounterBox value={t.h} label="Hours" testId="countdown-hours"   />
+                <span className="font-display font-bold" style={{ color:'var(--c-fg-mute)', paddingTop:10, fontSize:'1.1rem' }}>:</span>
+                <CounterBox value={t.m} label="Mins"  testId="countdown-minutes" />
+                <span className="font-display font-bold" style={{ color:'var(--c-fg-mute)', paddingTop:10, fontSize:'1.1rem' }}>:</span>
+                <CounterBox value={t.s} label="Secs"  testId="countdown-seconds" />
               </div>
 
               <a
                 data-testid="contact-cta"
                 href="mailto:hello@c3.club"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-grotesk font-semibold text-base transition-all hover:scale-105"
-                style={{ background:'var(--c-mint)', color:'var(--c-ink)', boxShadow:'0 0 20px rgba(74,240,160,0.25)' }}
+                style={{
+                  display:'inline-flex', alignItems:'center', gap:8,
+                  padding:'11px 24px', borderRadius:9999,
+                  fontFamily:"'Cabinet Grotesk',sans-serif", fontWeight:700, fontSize:'0.9rem',
+                  background:'var(--c-mint)', color:'var(--c-ink)',
+                  textDecoration:'none',
+                  boxShadow:'0 0 18px rgba(74,240,160,0.22)',
+                  transition:'transform 0.2s',
+                  whiteSpace:'nowrap',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.04)'; }}
+                onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
               >
                 Pre-register Interest
-                <ArrowUpRight size={16} />
+                <ArrowUpRight size={15} />
               </a>
             </div>
           </motion.div>
+
         </div>
       </div>
     </section>
