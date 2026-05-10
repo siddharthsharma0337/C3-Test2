@@ -40,7 +40,7 @@ const PANELS = [
   },
 ];
 
-export default function C3Hero3D({ mobileCompact = false }) {
+export default function C3Hero3D() {
   const sceneRef = useRef(null);
   const rafRef = useRef(null);
   const mouseRef = useRef({ x: 0, y: 0 });
@@ -164,26 +164,6 @@ export default function C3Hero3D({ mobileCompact = false }) {
           width: 100%;
           height: 100%;
           min-height: 420px;
-        }
-
-        /* Compact mode — used when floating above hero text on mobile */
-        .c3-3d-wrap--compact {
-          min-height: 220px;
-          height: 220px;
-          perspective: 500px;
-        }
-        .c3-3d-wrap--compact .c3-scene {
-          width: 170px;
-          height: 170px;
-        }
-        .c3-3d-wrap--compact .c3-mark {
-          font-size: 5.2rem;
-        }
-        .c3-3d-wrap--compact .c3-mark sup {
-          font-size: 2.2rem;
-        }
-        .c3-3d-wrap--compact .c3-core {
-          border-radius: 22px;
         }
 
         .c3-scene {
@@ -360,13 +340,9 @@ export default function C3Hero3D({ mobileCompact = false }) {
           .c3-mark sup { font-size: 2rem; }
           .c3-panel, .c3-ring, .c3-ring-2, .c3-triangle { display: none; }
         }
-
-        /* In compact/mobile hero mode — hide corner tag (redundant with headline below) */
-        .c3-3d-wrap--compact .c3-corner-tag { display: none; }
-        .c3-3d-wrap--compact .c3-triangle   { display: none; }
       `}</style>
 
-      <div className={`c3-3d-wrap${mobileCompact ? ' c3-3d-wrap--compact' : ''}`}>
+      <div className="c3-3d-wrap">
         <div className="c3-scene" ref={sceneRef}>
 
           <div className="c3-ring" />
